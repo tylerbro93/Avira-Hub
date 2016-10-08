@@ -22,6 +22,7 @@ weatherField = Label(root,font=("times",20,"bold"),bg=backgroundColor, fg=foregr
 tempField = Label(root,font=("times",20,"bold") ,bg=backgroundColor , fg=foregroundColor, text = "this")
 
 setup = {}
+weatherconditions = []
 actionData = []
 reportPhrases = ["I thought I should let you know that", "I would like to remind you that", "Remember that I am your gaurdian to your family that is why I must remind you that", "I will always assist you that is why i must tell you ."]
 alarmPhrases = ["I know you don't want to get up, but think of the possibilities", "I know today is goingto be a great day so wake up.", "Ok listen we are both tired, but hey you've got work to do.", "You know what they say waking up early is good for something ha ha", "Good Morning and dont forget to be expectional today", "Life is like a nuclear appocolapse  you never know what is going to happen, so why don't you start your day"]
@@ -42,18 +43,35 @@ def settime():
        setup["period"] = "a.m."
     return setup
 
-def setTransitionTimes():
+def checkTransitionTimes():
     global setup
     global clockField
     global weatherField
     global tempField
-    
-    if(((setup["h"]) >= (setup["sunrise"])) and (setup["morning"] == "off")):
-        backgroundColor = "yellow"
+    if((int(setup["h"]) >= int(setup["sunrise"])) and (setup["morning"] == "off")):
+        backgroundColor = "lightgrey"
         foregroundColor = "dodgerblue"
         clockField.config(bg=backgroundColor, fg=foregroundColor)
         weatherField.config(bg=backgroundColor, fg=foregroundColor)
         tempField.config(bg=backgroundColor, fg=foregroundColor)
+        root.config(background = backgroundColor)
+        callAveraButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
+    elif((int(setup["h"]) >= int(setup["sunset"])) and (setup["afternoon"] == "off")):
+        backgroundColor = "orangered"
+        foregroundColor = "darkviolet"
+        clockField.config(bg=backgroundColor, fg=foregroundColor)
+        weatherField.config(bg=backgroundColor, fg=foregroundColor)
+        tempField.config(bg=backgroundColor, fg=foregroundColor)
+        root.config(background = backgroundColor)
+        callAveraButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
+    elif((int(setup["h"]) >= int(setup["bedTimeHour"])) and (setup["sleep"] == "off")):
+        backgroundColor = "black"
+        foregroundColor = "red2"
+        clockField.config(bg=backgroundColor, fg=foregroundColor)
+        weatherField.config(bg=backgroundColor, fg=foregroundColor)
+        tempField.config(bg=backgroundColor, fg=foregroundColor)
+        root.config(background = backgroundColor)
+        callAveraButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
         
 def assignTimeValues():
     global setup
@@ -71,7 +89,11 @@ def readNotificaions():
         averaSpeach(actionData[alert])
         
 callAveraButton = Button(root,activebackground=backgroundColor, activeforeground=foregroundColor, font=("times",20,"bold"),highlightthickness=0,bd = 0,text = "CALL",bg=backgroundColor, fg=foregroundColor, command=readNotificaions)
-        
+
+def itsBedTime():
+    goodNightStatements = ["If you would like to perform your best, I would reccommend that you go to bed now.", "I here to inform you, that it would be wise, to head to bed."]
+    averaSpeach(goodNightStatements[randint(0,(len(goodNightStatements)-1))])
+    
 def checkAlarms(time):
     global alarmPhrases
     time = (str(setup["h"]) + ":" + str(setup["M"]))
@@ -80,6 +102,8 @@ def checkAlarms(time):
             averaSpeach(alarmPhrases[randint(0,(len(alarmPhrases) - 1))])
             print("ring")
             readNotificaions()
+    if(actionData[33] == time):
+        itsBedTime()
             
 def checkReportTimes(time):
     global reportPhrases
@@ -93,14 +117,15 @@ def initializeWeather():
     setTemp()
     setWeatherConditions()
     setSunriseAndSunsetTimes()
-    setTransitionTimes()
     
 def weatherChanges():
     fc = owm.three_hours_forecast("US, Anniston")
     f = fc.get_forecast()
     lst = f.get_weathers()
+    count = 0
     for weather in f:
         print (weather.get_reference_time('iso'),weather.get_status())
+        
     
 def setWeatherConditions():
     global weatherField
@@ -110,7 +135,6 @@ def setWeatherConditions():
 def setTemp():
     global tempField
     temp = w.get_temperature('fahrenheit')
-    print temp
     tempField.config(text = str(temp['temp']))
 
 def setSunriseAndSunsetTimes():
@@ -127,7 +151,6 @@ def setSunriseAndSunsetTimes():
     hour = str((int(hour)-5))
     sunrise = hour
     setup["sunrise"] = sunrise
-    print setup["sunrise"]
             
 def getDay():
     day = time.strftime("%d")
@@ -166,6 +189,9 @@ def welcomeMessage():
     #averaSpeach("It is always good to see you, Tyler. I will do my best to serve you, always.")
     setSunriseAndSunsetTimes()
     setup["morning"] = "off"
+    setup["afternoon"] = "off"
+    setup["sleep"] = "off"
+    
 def runClock():
     global clockField
     time = assignTimeValues()
@@ -174,6 +200,7 @@ def runClock():
     clockField.config(text = time)
     if((setup["M"]) == "30" or (setup["M"]) == "00" ):
         initializeWeather()
+        checkTransitionTimes() 
     clockField.after(1000, runClock)
     
 def main():
@@ -191,7 +218,7 @@ def main():
     runClock()
     initializeWeather()
     weatherChanges()
-    setTransitionTimes()
+    checkTransitionTimes()
     root.mainloop()
 
 main()
