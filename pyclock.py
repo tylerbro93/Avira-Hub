@@ -56,7 +56,7 @@ def checkTransitionTimes():
         tempField.config(bg=backgroundColor, fg=foregroundColor)
         root.config(background = backgroundColor)
         callAveraButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
-    elif((int(setup["h"]) >= int(setup["sunset"])) and (setup["afternoon"] == "off")):
+    if((int(setup["h"]) >= int(setup["sunset"])) and (setup["afternoon"] == "off")):
         backgroundColor = "orangered"
         foregroundColor = "darkviolet"
         clockField.config(bg=backgroundColor, fg=foregroundColor)
@@ -64,7 +64,7 @@ def checkTransitionTimes():
         tempField.config(bg=backgroundColor, fg=foregroundColor)
         root.config(background = backgroundColor)
         callAveraButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
-    elif((int(setup["h"]) >= int(setup["bedTimeHour"])) and (setup["sleep"] == "off")):
+    if((int(setup["h"]) >= int(setup["bedTimeHour"])) and (setup["sleep"] == "off")):
         backgroundColor = "black"
         foregroundColor = "red2"
         clockField.config(bg=backgroundColor, fg=foregroundColor)
@@ -83,16 +83,32 @@ def assignTimeValues():
     return time
 
 def readNotificaions():
+    global weatherconditions
     global reportPhrases
+    global setup
     averaSpeach(reportPhrases[randint(0,(len(reportPhrases))-1)])
     for alert in range(4, 16):
         averaSpeach(actionData[alert])
+    referenceTime = int(setup["WeatherConditionsStartTime"])
+    averaSpeach("Current weather conditions are ")
+    for weatherAlert in range(0, 5):
+        averaSpeach(weatherconditions[weatherAlert] + ",,")
+        averaSpeach(str(referenceTime) + "O'Clock ,,")
+        referenceTime += 5
+        if(weatherAlert != 4):
+            averaSpeach(" ,and ")
         
 callAveraButton = Button(root,activebackground=backgroundColor, activeforeground=foregroundColor, font=("times",20,"bold"),highlightthickness=0,bd = 0,text = "CALL",bg=backgroundColor, fg=foregroundColor, command=readNotificaions)
 
 def itsBedTime():
     goodNightStatements = ["If you would like to perform your best, I would reccommend that you go to bed now.", "I here to inform you, that it would be wise, to head to bed."]
     averaSpeach(goodNightStatements[randint(0,(len(goodNightStatements)-1))])
+
+def setBedTimeHour():
+    global actionData
+    bedTime = actionData[33]
+    bedTimeHour, garbage = bedTime.split(":")
+    setup["bedTimeHour"] = bedTimeHour
     
 def checkAlarms(time):
     global alarmPhrases
@@ -119,17 +135,21 @@ def initializeWeather():
     setSunriseAndSunsetTimes()
     
 def initFutureWeatherChanges():
+    global setup
     global weatherconditions
     fc = owm.three_hours_forecast("US, Anniston")
     f = fc.get_forecast()
     lst = f.get_weathers()
+    g = lst[0]
     count = 0
+    isoData = g.get_reference_time('iso')
+    garbage, timeStamp = isoData.split(" ")
+    hour, minute, second = timeStamp.split(":")
+    hour = int(hour) - 5
+    if(hour < 0):
+        hour = hour + 24
+    setup["WeatherConditionsStartTime"] = str(hour)
     for weather in f:
-        isoData = weather.get_reference_time('iso')
-        garbage, timeStamp = isoData.split(" ")
-        hour, minute, second = timeStamp.split(":")
-        hour = int(hour) - 5
-        setup["WeatherConditionsStartTime"] = str(hour)
         if(count < 5):
             text = weather.get_status()
             weatherconditions.append(str(text)) 
@@ -141,14 +161,16 @@ def updateFutureWeatherChanges():
     fc = owm.three_hours_forecast("US, Anniston")
     f = fc.get_forecast()
     lst = f.get_weathers()
+    g = lst[0]
     count = 0
+    isoData = g.get_reference_time('iso')
+    garbage, timeStamp = isoData.split(" ")
+    hour, minute, second = timeStamp.split(":")
+    hour = int(hour) - 5
+    if(hour < 0):
+        hour = hour + 24
+    setup["WeatherConditionsStartTime"] = str(hour)
     for weather in f:
-        #print (weather.get_reference_time('iso'),weather.get_status())
-        isoData = weather.get_reference_time('iso')
-        garbage, timeStamp = isoData.split(" ")
-        hour, minute, second = timeStamp.split(":")
-        hour = int(hour) - 5
-        setup["WeatherConditionsStartTime"] = str(hour)
         if(count < 5):
             text = weather.get_status()
             weatherconditions[count] = (str(text)) 
@@ -243,6 +265,7 @@ def main():
     tempField.grid(row=2,column=2)
     callAveraButton.grid(row=0, column=0)
     readCSVDataFromFile()
+    setBedTimeHour()
     runClock()
     initFutureWeatherChanges()
     initializeWeather()
