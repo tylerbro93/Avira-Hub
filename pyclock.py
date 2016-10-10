@@ -118,15 +118,42 @@ def initializeWeather():
     setWeatherConditions()
     setSunriseAndSunsetTimes()
     
-def weatherChanges():
+def initFutureWeatherChanges():
+    global weatherconditions
     fc = owm.three_hours_forecast("US, Anniston")
     f = fc.get_forecast()
     lst = f.get_weathers()
     count = 0
     for weather in f:
-        print (weather.get_reference_time('iso'),weather.get_status())
+        isoData = weather.get_reference_time('iso')
+        garbage, timeStamp = isoData.split(" ")
+        hour, minute, second = timeStamp.split(":")
+        hour = int(hour) - 5
+        setup["WeatherConditionsStartTime"] = str(hour)
+        if(count < 5):
+            text = weather.get_status()
+            weatherconditions.append(str(text)) 
+        count += 1
         
-    
+def updateFutureWeatherChanges():
+    global setup
+    global weatherconditions
+    fc = owm.three_hours_forecast("US, Anniston")
+    f = fc.get_forecast()
+    lst = f.get_weathers()
+    count = 0
+    for weather in f:
+        #print (weather.get_reference_time('iso'),weather.get_status())
+        isoData = weather.get_reference_time('iso')
+        garbage, timeStamp = isoData.split(" ")
+        hour, minute, second = timeStamp.split(":")
+        hour = int(hour) - 5
+        setup["WeatherConditionsStartTime"] = str(hour)
+        if(count < 5):
+            text = weather.get_status()
+            weatherconditions[count] = (str(text)) 
+        count += 1
+        
 def setWeatherConditions():
     global weatherField
     weather =  w.get_detailed_status()
@@ -136,6 +163,7 @@ def setTemp():
     global tempField
     temp = w.get_temperature('fahrenheit')
     tempField.config(text = str(temp['temp']))
+    return temp
 
 def setSunriseAndSunsetTimes():
     global setup
@@ -216,8 +244,8 @@ def main():
     callAveraButton.grid(row=0, column=0)
     readCSVDataFromFile()
     runClock()
+    initFutureWeatherChanges()
     initializeWeather()
-    weatherChanges()
     checkTransitionTimes()
     root.mainloop()
 
