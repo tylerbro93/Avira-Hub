@@ -93,7 +93,7 @@ def readNotificaions():
     averaSpeach("Current weather conditions are ")
     for weatherAlert in range(0, 5):
         averaSpeach(weatherconditions[weatherAlert] + ",,")
-        averaSpeach(str(referenceTime) + "O'Clock ,,")
+        averaSpeach(" at " + str(referenceTime) + " O Clock ,,")
         referenceTime += 5
         if(weatherAlert != 4):
             averaSpeach(" ,and ")
