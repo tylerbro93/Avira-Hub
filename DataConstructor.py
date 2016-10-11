@@ -3,13 +3,14 @@ import calendar
 from datetime import date
 
 data = [""] * 34
-amountOfAlarms = 4 #0-3
-amountOfNotifications = 12 #4-15
-amountOfReportTimes = 5 #16-20
-amountOfTests = 6 #21-26
-amountOfAssignments = 6 # 27-32
-amountOfBedTimeAlert = 1 #33
-
+"""
+    amountOfAlarms = 4 #0-3
+    amountOfNotifications = 12 #4-15
+    amountOfReportTimes = 5 #16-20
+    amountOfTests = 6 #21-26
+    amountOfAssignments = 6 # 27-32
+    amountOfBedTimeAlert = 1 #33
+"""
 year = ""
 displayData = []
 
@@ -38,7 +39,107 @@ def runActionsFromChoice(choice):
         day = getDay(month)
         readCSVDataFromFile(month, day, 4, 15)
         reportTime(month, day)
+    elif(choice == 4):
+        testData = readInTests()
+        displayTests(testData)
+        testData = editTestInfo(testData)
+        writeTestInformation(testData)
+    elif(choice == 5):
+        assignmentData = readInAssignment()
+        displayAssignment(assignmentData)
+        assignmentData = editAssignmentInfo(assignmentData)
+        writeAssignmentInformation(assignmentData)
+
+def readInAssignment():
+    assignmentData = []
+    infile = open("assignments.csv")
+    line = infile.readline().strip()
+    count = 0
+    while(count != 10):
+        if(line != ","):
+            assignmentInfo, date = line.split(",")
+            assignmentData.append(date + ": " + assignmentInfo)
+        else:
+            assignmentData.append(" ")
+        count += 1
+        line = infile.readline().strip()
+    infile.close()
+    return assignmentData
+
+def displayAssignment(assignmentData):
+    print("DATE:   Description")
+    count = 1
+    for i in range(0, 10):
+        info = assignmentData[i]
+        print(str(count) + ".) " + info)
+        count += 1
         
+def editAssignmentInfo(assignmentData):
+    choice = input("What would you like to change: ")
+    month = raw_input("what is the month that it is due: ")
+    day = raw_input("what is the day that it is due: ")
+    assignmentInfo = (raw_input("Please give a descrition or title for the assignment: "))
+    assignmentData[int(choice) - 1] = (day + "-" + month + ": " + assignmentInfo)
+    return assignmentData
+
+def writeAssignmentInformation(assignmentData):
+    infile = open("assignments.csv", "w")
+    text = ""
+    for i in range(0, 10):
+        info = assignmentData[i]
+        if(info != " "):
+            date, assignmentInfo = info.split(": ")
+            text = text + date+ "," + assignmentInfo + "\n"
+        else:
+            text = text + ",\n"
+    infile.write(text)
+    infile.close()
+    
+def readInTests():
+    testData = []
+    infile = open("tests.csv")
+    line = infile.readline().strip()
+    count = 0
+    while(count != 10):
+        if(line != ","):
+            testInfo, date = line.split(",")
+            testData.append(date + ": " + testInfo)
+        else:
+            testData.append(" ")
+        count += 1
+        line = infile.readline().strip()
+    infile.close()
+    return testData
+
+def displayTests(testData):
+    print("DATE:   Description")
+    count = 1
+    for i in range(0, 10):
+        info = testData[i]
+        print(str(count) + ".) " + info)
+        count += 1
+        
+def editTestInfo(testData):
+    choice = input("What would you like to change: ")
+    month = raw_input("what is the month that it is due: ")
+    day = raw_input("what is the day that it is due: ")
+    testInfo = (raw_input("Please give a descrition or title for the test: "))
+    testData[int(choice) - 1] = (day + "-" + month + ": " + testInfo)
+    return testData
+
+def writeTestInformation(testData):
+    infile = open("tests.csv", "w")
+    text = ""
+    for i in range(0, 10):
+        info = testData[i]
+        if(info != " "):
+            date, testInfo = info.split(": ")
+            text = text + date+ "," + testInfo + "\n"
+        else:
+            text = text + ",\n"
+    infile.write(text)
+    infile.close()
+    
 def displayDataValues():
     global displayData
     number = 1
@@ -140,7 +241,7 @@ def editTimes(i):
 
 def actionPrompt():
     print("WELCOME TYLER!\n1. alarms\n2. notification")
-    print("3. Report Times\n4. Set Defualt times\n5. settings")
+    print("3. Report Times\n4. Set test info\n5. set assignment info\n6. Set Defualt times\n7. settings")
     choice = input("What would like to do: ")
     print(50 * "\n")
     return choice
