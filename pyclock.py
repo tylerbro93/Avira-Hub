@@ -26,7 +26,8 @@ weatherconditions = []
 actionData = []
 reportPhrases = ["I thought I should let you know that", "I would like to remind you that", "Remember that I am your gaurdian to your family that is why I must remind you that", "I will always assist you that is why i must tell you ."]
 alarmPhrases = ["I know you don't want to get up, but think of the possibilities", "I know today is goingto be a great day so wake up.", "Ok listen we are both tired, but hey you've got work to do.", "You know what they say waking up early is good for something ha ha", "Good Morning and dont forget to be expectional today", "Life is like a nuclear appocolapse  you never know what is going to happen, so why don't you start your day"]
-
+tests = []
+assignments = []
 
 def settime():
     global setup
@@ -112,14 +113,30 @@ def readNotificaions():
             referenceTime = referenceTime - 24
         if(referenceTime > 12):
             referenceTimeFix = str(referenceTime - 12)
-            averaSpeach(" at " + str(referenceTime) + " O Clock P M " + currentDay)
+            averaSpeach(" at " + str(referenceTimeFix) + " O Clock P M " + currentDay)
         if(referenceTime < 12):
             averaSpeach(" at " + str(referenceTime) + " O Clock A M " + currentDay)
         referenceTime += 5
         if(weatherAlert != 4):
             averaSpeach(" ,and ")
+    alertOfTests()
+    alertOfAssignments()
         
 callAveraButton = Button(root,activebackground=backgroundColor, activeforeground=foregroundColor, font=("times",20,"bold"),highlightthickness=0,bd = 0,text = "CALL",bg=backgroundColor, fg=foregroundColor, command=readNotificaions)
+
+def alertOfTests():
+    global tests
+    if(len(tests) != 0):
+        averaSpeach("Your current tests you need to prepare for are: ")
+        for test in tests:
+            averaSpeach(test)
+            
+def alertOfAssignments():
+    global assignments
+    if(len(assignments) != 0):
+        averaSpeach("Your current assignments you need to do are: ")
+        for assignment in assignments:
+            averaSpeach(assignment)
 
 def itsBedTime():
     goodNightStatements = ["If you would like to perform your best, I would reccommend that you go to bed now.", "I here to inform you, that it would be wise, to head to bed."]
@@ -249,7 +266,37 @@ def readCSVDataFromFile():
         dayCounter = dayCounter + 1
         line = infile.readline().strip()
     infile.close()
+    
+def readTestData():
+    global tests
+    monthlist = ["January", "February", "March", "April", "May", "June", "July", "August","September", "October", "November", "December"] 
+    infile = open("tests.csv")
+    line = infile.readline().strip()
+    while(len(line)>0):
+        if(line != ","):
+            date, info = line.split(",")
+            monthnum, day = date.split("-")
+            month = monthlist[int(monthnum) - 1]
+            text = info + " on,,,, " + month + ",,, " + day
+            tests.append(text)
+        line = infile.readline().strip()
+    infile.close()
 
+def readAssignmentData():
+    global assignments
+    monthlist = ["January", "February", "March", "April", "May", "June", "July", "August","September", "October", "November", "December"] 
+    infile = open("assignments.csv")
+    line = infile.readline().strip()
+    while(len(line)>0):
+        if(line != ","):
+            date, info = line.split(",")
+            monthnum, day = date.split("-")
+            month = monthlist[int(monthnum) - 1]
+            text = info + " on " + month + ", " + day
+            assignments.append(text)
+        line = infile.readline().strip()
+    infile.close()
+    
 def averaSpeach(text):
     os.system("espeak -v female3 '" + text + "'")
     
@@ -286,6 +333,7 @@ def main():
     tempField.grid(row=2,column=2)
     callAveraButton.grid(row=0, column=0)
     readCSVDataFromFile()
+    readTestData()
     setBedTimeHour()
     runClock()
     initFutureWeatherChanges()

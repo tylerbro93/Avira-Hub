@@ -79,7 +79,7 @@ def editAssignmentInfo(assignmentData):
     month = raw_input("what is the month that it is due: ")
     day = raw_input("what is the day that it is due: ")
     assignmentInfo = (raw_input("Please give a descrition or title for the assignment: "))
-    assignmentData[int(choice) - 1] = (day + "-" + month + ": " + assignmentInfo)
+    assignmentData[int(choice) - 1] = (month + "-" + day + ": " + assignmentInfo)
     return assignmentData
 
 def writeAssignmentInformation(assignmentData):
@@ -124,7 +124,7 @@ def editTestInfo(testData):
     month = raw_input("what is the month that it is due: ")
     day = raw_input("what is the day that it is due: ")
     testInfo = (raw_input("Please give a descrition or title for the test: "))
-    testData[int(choice) - 1] = (day + "-" + month + ": " + testInfo)
+    testData[int(choice) - 1] = (month + "-" + day + ": " + testInfo)
     return testData
 
 def writeTestInformation(testData):
