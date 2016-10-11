@@ -9,7 +9,7 @@ from pyowm import OWM
 #sudo apt-get install espeak
 #sudo pip install pyowm
 
-API_key = '8a74e5d89485c26ec225fd3c27d1379d'
+API_key = '5b5693677ce916aeb8ce810029baf174'
 owm = OWM(API_key)
 obs = owm.weather_at_place("US, Anniston")
 w = obs.get_weather()
@@ -34,11 +34,15 @@ def settime():
     setup["M"] = datetime.datetime.now().minute
     setup["S"] = datetime.datetime.now().second
     setup["h"] = H
+    minute = str(setup["M"])
+    if(len(minute) != 2):
+        minute = "0" + minute
+        setup["M"] = minute
     if(H >12):
         H = H - 12
         setup["H"] = H
         setup["period"] = "p.m."
-    else:
+    if(H < 12):
        setup["H"] = H
        setup["period"] = "a.m."
     return setup
@@ -51,6 +55,14 @@ def checkTransitionTimes():
     if((int(setup["h"]) >= int(setup["sunrise"])) and (setup["morning"] == "off")):
         backgroundColor = "lightgrey"
         foregroundColor = "dodgerblue"
+        clockField.config(bg=backgroundColor, fg=foregroundColor)
+        weatherField.config(bg=backgroundColor, fg=foregroundColor)
+        tempField.config(bg=backgroundColor, fg=foregroundColor)
+        root.config(background = backgroundColor)
+        callAveraButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
+    if( int(setup["h"]) >= 9 ):
+        backgroundColor = "lawngreen"
+        foregroundColor = "green"
         clockField.config(bg=backgroundColor, fg=foregroundColor)
         weatherField.config(bg=backgroundColor, fg=foregroundColor)
         tempField.config(bg=backgroundColor, fg=foregroundColor)
@@ -91,9 +103,18 @@ def readNotificaions():
         averaSpeach(actionData[alert])
     referenceTime = int(setup["WeatherConditionsStartTime"])
     averaSpeach("Current weather conditions are ")
+    currentDay = " Today,,"
     for weatherAlert in range(0, 5):
         averaSpeach(weatherconditions[weatherAlert] + ",,")
-        averaSpeach(" at " + str(referenceTime) + " O Clock ,,")
+        referenceTimeFix = ""
+        if(referenceTime > 24):
+            currentDay = " Tomorrow,, "
+            referenceTime = referenceTime - 24
+        if(referenceTime > 12):
+            referenceTimeFix = str(referenceTime - 12)
+            averaSpeach(" at " + str(referenceTime) + " O Clock P M " + currentDay)
+        if(referenceTime < 12):
+            averaSpeach(" at " + str(referenceTime) + " O Clock A M " + currentDay)
         referenceTime += 5
         if(weatherAlert != 4):
             averaSpeach(" ,and ")
