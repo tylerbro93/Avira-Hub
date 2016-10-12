@@ -70,8 +70,8 @@ def checkTransitionTimes():
         root.config(background = backgroundColor)
         callAveraButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
     if((int(setup["h"]) >= int(setup["sunset"])) and (setup["afternoon"] == "off")):
-        backgroundColor = "orangered"
-        foregroundColor = "darkviolet"
+        backgroundColor = "dodgerblue2"
+        foregroundColor = "blue2"
         clockField.config(bg=backgroundColor, fg=foregroundColor)
         weatherField.config(bg=backgroundColor, fg=foregroundColor)
         tempField.config(bg=backgroundColor, fg=foregroundColor)
@@ -119,6 +119,7 @@ def readNotificaions():
         referenceTime += 5
         if(weatherAlert != 4):
             averaSpeach(" ,and ")
+        sleep(.1)
     alertOfTests()
     alertOfAssignments()
         
@@ -144,7 +145,7 @@ def itsBedTime():
 
 def setBedTimeHour():
     global actionData
-    bedTime = actionData[33]
+    bedTime = actionData[21]
     bedTimeHour, garbage = bedTime.split(":")
     setup["bedTimeHour"] = bedTimeHour
     
@@ -156,7 +157,7 @@ def checkAlarms(time):
             averaSpeach(alarmPhrases[randint(0,(len(alarmPhrases) - 1))])
             print("ring")
             readNotificaions()
-    if(actionData[33] == time):
+    if(actionData[21] == time):
         itsBedTime()
             
 def checkReportTimes(time):
@@ -298,7 +299,7 @@ def readAssignmentData():
     infile.close()
     
 def averaSpeach(text):
-    os.system("espeak -v female3 '" + text + "'")
+    os.system("espeak -v female3 '" + text + "' -s 140")
     
 def welcomeMessage():
     global setup

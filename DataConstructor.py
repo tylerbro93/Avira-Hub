@@ -2,14 +2,14 @@ import csv
 import calendar
 from datetime import date
 
-data = [""] * 34
+data = [""] * 23
 """
     amountOfAlarms = 4 #0-3
     amountOfNotifications = 12 #4-15
     amountOfReportTimes = 5 #16-20
     amountOfTests = 6 #21-26
     amountOfAssignments = 6 # 27-32
-    amountOfBedTimeAlert = 1 #33
+    amountOfBedTimeAlert = 1 #21
 """
 year = ""
 displayData = []
@@ -162,8 +162,6 @@ def readCSVDataFromFile(month, day, low, high):
 def loadIntoStorage(dataCollection, low, high):
     valuesHolder = []
     valuesHolder = dataCollection.split(',')
-    print("done")
-    print(valuesHolder)
     getDisplayData(valuesHolder, low, high)
 
 def getDisplayData(valuesHolder, low, high):
@@ -200,8 +198,9 @@ def writeData(dataToBeWritten, month):
     infile = open(year + "-" + str(month) +".csv", "w")
     infile.write(dataToBeWritten)
     infile.close()
-        
+    
 def buildWriteData(low, high, month, day):
+    global displayData
     dayCounter = 1
     valuesHolder = []
     dataToBeWritten = ""
@@ -212,9 +211,8 @@ def buildWriteData(low, high, month, day):
         if(dayCounter == day):
             valuesHolder = line.split(',')
             for i in range(low, high+1):
-                print i
                 valuesHolder[i] = displayData[i - low]
-            for i in range(0,34):
+            for i in range(0,22):
                 if(i != 0):
                     modifiedData += ","
                 modifiedData = modifiedData + valuesHolder[i]
@@ -259,7 +257,6 @@ def doesFileExist(month):
     infile = open("2016-filesConstructed.txt")
     line = infile.readline()
     while len(line) > 0:
-        print(line)
         filesInExistance.append(line)
         line = infile.readline()
     infile.close()
@@ -273,11 +270,10 @@ def doesFileExist(month):
         
 def makeNoteThatFileExist(month):
     file = open("2016-filesConstructed.txt", "a")
-    file.write("2016-" + str(month) + ".csv")
+    file.write("2016-" + str(month) + ".csv\n")
     file.close()
 
 def createFile(month):
-    emptyData = ["null"] * 27
     c = (open("2016-" + str(month) + ".csv", "w"))
     c.close()
     default = getDefaultValues()
@@ -304,7 +300,7 @@ def writeStartData(default, month):
         weekday = getWeekday(dateNum, month)
         section = default[weekday]
         completeSection = ""
-        for i in range(0, 33):
+        for i in range(0, 21):
             if(i == 0):
                 completeSection = completeSection + section[0]
             elif(i == 16):
