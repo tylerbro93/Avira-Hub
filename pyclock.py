@@ -17,9 +17,9 @@ root = Tk()
 backgroundColor = "lightgrey"
 foregroundColor = "dodgerblue"
 root.config(background=backgroundColor)
-clockField = Label(root,font=("times",60,"bold"), text = "Welcome",bg=backgroundColor, fg=foregroundColor)
-weatherField = Label(root,font=("times",20,"bold"),bg=backgroundColor, fg=foregroundColor ,text = "Sunny")
-tempField = Label(root,font=("times",20,"bold") ,bg=backgroundColor , fg=foregroundColor, text = "this")
+clockField = Label(root,font=("times",65,"bold"), text = "Welcome",bg=backgroundColor, fg=foregroundColor)
+weatherField = Label(root,font=("times",30,"bold"),bg=backgroundColor, fg=foregroundColor ,text = "Sunny")
+tempField = Label(root,font=("times",25,"bold") ,bg=backgroundColor , fg=foregroundColor, text = "this")
 
 setup = {}
 weatherconditions = []
@@ -123,7 +123,7 @@ def readNotificaions():
     alertOfTests()
     alertOfAssignments()
         
-callAveraButton = Button(root,activebackground=backgroundColor, activeforeground=foregroundColor, font=("times",20,"bold"),highlightthickness=0,bd = 0,text = "CALL",bg=backgroundColor, fg=foregroundColor, command=readNotificaions)
+callAveraButton = Button(root,activebackground=backgroundColor, activeforeground=foregroundColor, font=("times",25,"bold"),highlightthickness=0,bd = 0,text = "CALL",bg=backgroundColor, fg=foregroundColor, command=readNotificaions)
 
 def alertOfTests():
     global tests
@@ -340,6 +340,7 @@ def main():
     initFutureWeatherChanges()
     initializeWeather()
     checkTransitionTimes()
+    #root.geometry("500x300")
     root.mainloop()
 
 main()
