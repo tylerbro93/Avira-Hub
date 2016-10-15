@@ -9,25 +9,23 @@ from pyowm import OWM
 #sudo apt-get install espeak
 #sudo pip install pyowm
 
-API_key = '5b5693677ce916aeb8ce810029baf174'
-owm = OWM(API_key)
-obs = owm.weather_at_place("US, Anniston")
-w = obs.get_weather()
+
 root = Tk()
 backgroundColor = "lightgrey"
 foregroundColor = "dodgerblue"
 root.config(background=backgroundColor)
 clockField = Label(root,font=("times",65,"bold"), text = "Welcome",bg=backgroundColor, fg=foregroundColor)
 weatherField = Label(root,font=("times",30,"bold"),bg=backgroundColor, fg=foregroundColor ,text = "Sunny")
-tempField = Label(root,font=("times",25,"bold") ,bg=backgroundColor , fg=foregroundColor, text = "this")
+tempField = Label(root,font=("times",20,"bold") ,bg=backgroundColor , fg=foregroundColor, text = "this")
 
 setup = {}
 weatherconditions = []
 actionData = []
-reportPhrases = ["I thought I should let you know that", "I would like to remind you that", "Remember that I am your gaurdian to your family that is why I must remind you that", "I will always assist you that is why i must tell you ."]
-alarmPhrases = ["I know you don't want to get up, but think of the possibilities", "I know today is goingto be a great day so wake up.", "Ok listen we are both tired, but hey you've got work to do.", "You know what they say waking up early is good for something ha ha", "Good Morning and dont forget to be expectional today", "Life is like a nuclear appocolapse  you never know what is going to happen, so why don't you start your day"]
+reportPhrases = ["I thought I should let you know that", "I would like to remind you that", "Remember that, I am your gaurdian to your family,, that is why I must remind you, that", "I will always assist you, that is why, i must tell you ."]
+alarmPhrases = ["I know you don't want to get up, but think of the possibilities", "I know today is going to be a great day so wake up.", "Ok listen we are both tired, but hey you've got work to do.", "You know what they say waking up early is good for something ha ha", "Good Morning and dont forget to be expectional today", "Life is like a nuclear appocolapse  you never know what is going to happen, so why don't you start your day"]
 tests = []
 assignments = []
+blocker = 60
 
 def settime():
     global setup
@@ -111,12 +109,17 @@ def readNotificaions():
         if(referenceTime > 24):
             currentDay = " Tomorrow,, "
             referenceTime = referenceTime - 24
-        if(referenceTime > 12):
+        if(24 > referenceTime > 12):
             referenceTimeFix = str(referenceTime - 12)
-            averaSpeach(" at " + str(referenceTimeFix) + " O Clock P M " + currentDay)
+            averaSpeach(" at " + str(referenceTimeFix) + " O Clock, P.M. ," + currentDay)
+        if(referenceTime == 24):
+            averaSpeach(" at 12, A.M., " + currentDay)
         if(referenceTime < 12):
-            averaSpeach(" at " + str(referenceTime) + " O Clock A M " + currentDay)
-        referenceTime += 5
+            averaSpeach(" at " + str(referenceTime) + " O Clock, A.M., " + currentDay)
+        if(referenceTime == 12):
+            averaSpeach(" at 12 O Clock, P.M., " + currentDay)
+
+        referenceTime += 3
         if(weatherAlert != 4):
             averaSpeach(" ,and ")
         sleep(.1)
@@ -142,7 +145,8 @@ def alertOfAssignments():
 def itsBedTime():
     goodNightStatements = ["If you would like to perform your best, I would reccommend that you go to bed now.", "I here to inform you, that it would be wise, to head to bed."]
     averaSpeach(goodNightStatements[randint(0,(len(goodNightStatements)-1))])
-
+    activateBlocker()
+    
 def setBedTimeHour():
     global actionData
     bedTime = actionData[21]
@@ -157,6 +161,7 @@ def checkAlarms(time):
             averaSpeach(alarmPhrases[randint(0,(len(alarmPhrases) - 1))])
             print("ring")
             readNotificaions()
+            activateBlocker()
     if(actionData[21] == time):
         itsBedTime()
             
@@ -167,13 +172,35 @@ def checkReportTimes(time):
             averaSpeach(reportPhrases[randint(0,(len(reportPhrases)))])
             print("ring")
             readNotificaions()
-            
-def initializeWeather():
-    setTemp()
-    setWeatherConditions()
-    setSunriseAndSunsetTimes()
+            activateBlocker()
+
+def activateBlocker():
+    global blocker
+    blocker = 0
+
+def initWeather():
+    API_key = '5b5693677ce916aeb8ce810029baf174'
+    owm = OWM(API_key)
+    obs = owm.weather_at_place("US, Anniston")
+    w = obs.get_weather()
+    setTemp(w)
+    setWeatherConditions(w)
+    setSunriseAndSunsetTimes(w)
+    initFutureWeatherChanges(owm)
+    checkTransitionTimes()
+
+def refreshWeather():
+    API_key = '5b5693677ce916aeb8ce810029baf174'
+    owm = OWM(API_key)
+    obs = owm.weather_at_place("US, Anniston")
+    w = obs.get_weather()
+    setTemp(w)
+    setWeatherConditions(w)
+    setSunriseAndSunsetTimes(w)
+    updateFutureWeatherChanges(owm)
+    checkTransitionTimes()
     
-def initFutureWeatherChanges():
+def initFutureWeatherChanges(owm):
     global setup
     global weatherconditions
     fc = owm.three_hours_forecast("US, Anniston")
@@ -194,7 +221,7 @@ def initFutureWeatherChanges():
             weatherconditions.append(str(text)) 
         count += 1
         
-def updateFutureWeatherChanges():
+def updateFutureWeatherChanges(owm):
     global setup
     global weatherconditions
     fc = owm.three_hours_forecast("US, Anniston")
@@ -215,18 +242,18 @@ def updateFutureWeatherChanges():
             weatherconditions[count] = (str(text)) 
         count += 1
         
-def setWeatherConditions():
+def setWeatherConditions(w):
     global weatherField
     weather =  w.get_detailed_status()
     weatherField.config(text = weather)
 
-def setTemp():
+def setTemp(w):
     global tempField
     temp = w.get_temperature('fahrenheit')
     tempField.config(text = str(temp['temp']))
     return temp
 
-def setSunriseAndSunsetTimes():
+def setSunriseAndSunsetTimes(w):
     global setup
     rawData = w.get_sunset_time('iso')
     garbage, timestamp = rawData.split(" ")
@@ -306,20 +333,22 @@ def welcomeMessage():
     text = "Hello, I am AVIRA. It is my job to oversee the Brown Family"
     averaSpeach(text)
     #averaSpeach("It is always good to see you, Tyler. I will do my best to serve you, always.")
-    setSunriseAndSunsetTimes()
     setup["morning"] = "off"
     setup["afternoon"] = "off"
     setup["sleep"] = "off"
     
 def runClock():
     global clockField
+    global blocker
     time = assignTimeValues()
-    checkAlarms(time)
-    checkReportTimes(time)
+    if(blocker == 60):
+        checkAlarms(time)
+        checkReportTimes(time)
+    else:
+        blocker += 1
     clockField.config(text = time)
     if((setup["M"]) == "30" or (setup["M"]) == "00" ):
-        initializeWeather()
-        checkTransitionTimes() 
+        refreshWeather()
     clockField.after(1000, runClock)
     
 def main():
@@ -327,7 +356,7 @@ def main():
     global clockField
     global backgroundColor
     global foregroundColor
-    root.title("Avira by Tyler Brown")
+    root.title("Avira by tylerbro93")
     welcomeMessage()
     clockField.grid(row=1,column=1)
     weatherField.grid(row=2,column=1)
@@ -337,9 +366,7 @@ def main():
     readTestData()
     setBedTimeHour()
     runClock()
-    initFutureWeatherChanges()
-    initializeWeather()
-    checkTransitionTimes()
+    initWeather()
     #root.geometry("500x300")
     root.mainloop()
 

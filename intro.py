@@ -52,6 +52,7 @@ def checkIfFileInfoCanBeFound():
         changeStatusTo("ALL SYSTEMS ARE A GO! \nCODE: GREEN", "green")
         averaSpeach("All Systems are a go.")
         sleep(5)
+        os.system("python pyclock.py &")
     except:
         changeStatusTo("MISSING ESSENTIAL FILES \nCODE: RED", "red")
         averaSpeach("Alert! Critical Files are missing.")
@@ -60,17 +61,17 @@ def checkIfFileInfoCanBeFound():
 def checkIfAllSystemsAreAGO():
     global root
     global runs
+    if(runs == 0):
+        averaSpeach("Performing System Checks. Please Standby")
+        sleep(3)
     if(runs != 0):
         try:
-            if(runs == 0):
-                    averaSpeach("Performing System Checks. Please Standby")
-            if(runs != 0):
+            if(runs == 1):
                 averaSpeach("Attempting to establish link with weather service")
             API_key = "5b5693677ce916aeb8ce810029baf174"
             owm = OWM(API_key)
             state = owm.is_API_online()
-            print state
-            if(state == True and runs != 0):
+            if(state == True):
                 changeStatusTo("OPEN WEATHER SERVICE IS ONLINE \nCONDITION: GREEN", "green")
                 averaSpeach("Link Has Been Established. Please Standby")
                 sleep(2)
@@ -80,21 +81,23 @@ def checkIfAllSystemsAreAGO():
             changeStatusTo("ATTEMPT " + str(runs)+" TO CONTACT WEATHER SERVICE HAS FAILED \nCONDITION: ORANGE", "orange")
     if(runs == 60):
         changeStatusTo("ALL ATTEMPTS TO CONTACT THE WEATHER SERVICE HAS FAILED\nCONDITION: RED", "red")
-        averaSpeach("All atempts to contact the weather service, has failed.")
+        averaSpeach("All, attempts to contact the weather service, has failed.")
         sleep(6)
         root.destroy()
     runs += 1
     statusField.after(2000, checkIfAllSystemsAreAGO)
 
 def changeStatusTo(textData ,color):
-    statusField.configure(text = textData, fg= color)
+    statusField.configure(text = textData, fg= color,font=("times",8))
     root.update()
 
 def main():
+    global root
+    global statusField
     background_label = Tk.Label(root, image=background_image)
     background_label.pack()
-    statusField.pack()
-    #root.wm_geometry("500x300+10+10")
+    statusField.pack(side = "bottom")
+    root.wm_geometry("500x300+10+10")
     root.title('intro')
     checkIfAllSystemsAreAGO()
     root.mainloop()
