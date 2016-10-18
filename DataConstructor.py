@@ -57,7 +57,7 @@ def readInAssignment():
     count = 0
     while(count != 10):
         if(line != ","):
-            assignmentInfo, date = line.split(",")
+            date, assignmentInfo = line.split(",")
             assignmentData.append(date + ": " + assignmentInfo)
         else:
             assignmentData.append(" ")
@@ -102,7 +102,7 @@ def readInTests():
     count = 0
     while(count != 10):
         if(line != ","):
-            testInfo, date = line.split(",")
+            date, testInfo = line.split(",")
             testData.append(date + ": " + testInfo)
         else:
             testData.append(" ")

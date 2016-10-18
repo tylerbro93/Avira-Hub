@@ -23,9 +23,9 @@ weatherconditions = []
 actionData = []
 reportPhrases = ["I thought I should let you know that", "I would like to remind you that", "Remember that, I am your gaurdian to your family,, that is why I must remind you, that", "I will always assist you, that is why, i must tell you ."]
 alarmPhrases = ["I know you don't want to get up, but think of the possibilities", "I know today is going to be a great day so wake up.", "Ok listen we are both tired, but hey you've got work to do.", "You know what they say waking up early is good for something ha ha", "Good Morning and dont forget to be expectional today", "Life is like a nuclear appocolapse  you never know what is going to happen, so why don't you start your day"]
-tests = []
-assignments = []
-blocker = 60
+tests = [""] * 10
+assignments = [""] * 10
+blocker = 0
 
 def settime():
     global setup
@@ -44,6 +44,8 @@ def settime():
     if(H < 12):
        setup["H"] = H
        setup["period"] = "a.m."
+    if(H == 0):
+        setup["H"] = "12"
     return setup
 
 def checkTransitionTimes():
@@ -125,8 +127,14 @@ def readNotificaions():
         sleep(.1)
     alertOfTests()
     alertOfAssignments()
-        
-callAveraButton = Button(root,activebackground=backgroundColor, activeforeground=foregroundColor, font=("times",25,"bold"),highlightthickness=0,bd = 0,text = "CALL",bg=backgroundColor, fg=foregroundColor, command=readNotificaions)
+
+def call():
+    readCSVDataFromFile()
+    readAssignmentData()
+    readTestData()
+    readNotificaions()
+     
+callAveraButton = Button(root,activebackground=backgroundColor, activeforeground=foregroundColor, font=("times",25,"bold"),highlightthickness=0,bd = 0,text = "CALL",bg=backgroundColor, fg=foregroundColor, command=call)
 
 def alertOfTests():
     global tests
@@ -168,7 +176,7 @@ def checkAlarms(time):
 def checkReportTimes(time):
     global reportPhrases
     for reportSection in range(16,21):
-        if ((actionData[reportSection]+":0") == (time)):
+        if ((actionData[reportSection]+":00") == (time)):
             averaSpeach(reportPhrases[randint(0,(len(reportPhrases)))])
             print("ring")
             readNotificaions()
@@ -297,32 +305,40 @@ def readCSVDataFromFile():
     
 def readTestData():
     global tests
+    limit = 0
+    position = 0
     monthlist = ["January", "February", "March", "April", "May", "June", "July", "August","September", "October", "November", "December"] 
     infile = open("tests.csv")
     line = infile.readline().strip()
     while(len(line)>0):
-        if(line != ","):
+        if(line != "," and limit < 10):
             date, info = line.split(",")
             monthnum, day = date.split("-")
             month = monthlist[int(monthnum) - 1]
             text = info + " on,,,, " + month + ",,, " + day
-            tests.append(text)
+            tests[position] = text
+            position += 1
         line = infile.readline().strip()
+        limit += 1
     infile.close()
 
 def readAssignmentData():
     global assignments
+    limit = 0
+    position = 0
     monthlist = ["January", "February", "March", "April", "May", "June", "July", "August","September", "October", "November", "December"] 
     infile = open("assignments.csv")
     line = infile.readline().strip()
     while(len(line)>0):
-        if(line != ","):
+        if(line != "," and limit < 10):
             date, info = line.split(",")
             monthnum, day = date.split("-")
             month = monthlist[int(monthnum) - 1]
             text = info + " on " + month + ", " + day
-            assignments.append(text)
+            assignments[position] = text
+            position += 1
         line = infile.readline().strip()
+        limit += 1
     infile.close()
     
 def averaSpeach(text):
@@ -349,6 +365,9 @@ def runClock():
     clockField.config(text = time)
     if((setup["M"]) == "30" or (setup["M"]) == "00" ):
         refreshWeather()
+        readCSVDataFromFile()
+        readAssignmentData()
+        readTestData()
     clockField.after(1000, runClock)
     
 def main():
