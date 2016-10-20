@@ -1,5 +1,6 @@
 import csv
 import calendar
+import os
 from datetime import date
 
 data = [""] * 23
@@ -7,8 +8,6 @@ data = [""] * 23
     amountOfAlarms = 4 #0-3
     amountOfNotifications = 12 #4-15
     amountOfReportTimes = 5 #16-20
-    amountOfTests = 6 #21-26
-    amountOfAssignments = 6 # 27-32
     amountOfBedTimeAlert = 1 #21
 """
 year = ""
@@ -17,10 +16,8 @@ displayData = []
 def main():
     choice = actionPrompt()
     settings = getSettings()
-    print(settings)
     global year
     year = settings["year"]
-    print(settings["year"])
     runActionsFromChoice(choice)
 
 def runActionsFromChoice(choice):
@@ -49,7 +46,12 @@ def runActionsFromChoice(choice):
         displayAssignment(assignmentData)
         assignmentData = editAssignmentInfo(assignmentData)
         writeAssignmentInformation(assignmentData)
+    elif(choice == 6):
+        runCompletionMarker()
 
+def runCompletionMarker():
+    import completed
+    
 def readInAssignment():
     assignmentData = []
     infile = open("assignments.csv")
@@ -239,7 +241,7 @@ def editTimes(i):
 
 def actionPrompt():
     print("WELCOME TYLER!\n1. alarms\n2. notification")
-    print("3. Report Times\n4. Set test info\n5. set assignment info\n6. Set Defualt times\n7. settings")
+    print("3. Report Times\n4. Set test info\n5. set assignment info\n6. Set task as completed\n7. Set Defualt times\n7. settings")
     choice = input("What would like to do: ")
     print(50 * "\n")
     return choice
@@ -254,7 +256,7 @@ def getMonth():
 def doesFileExist(month):
     filesInExistance = []
     state = False
-    infile = open("2016-filesConstructed.txt")
+    infile = open("filesConstructed.txt")
     line = infile.readline()
     while len(line) > 0:
         filesInExistance.append(line)
@@ -269,12 +271,13 @@ def doesFileExist(month):
         makeNoteThatFileExist(month)
         
 def makeNoteThatFileExist(month):
-    file = open("2016-filesConstructed.txt", "a")
-    file.write("2016-" + str(month) + ".csv\n")
+    file = open("filesConstructed.txt", "a")
+    file.write(str(year) + "-" + str(month) + ".csv\n")
     file.close()
 
 def createFile(month):
-    c = (open("2016-" + str(month) + ".csv", "w"))
+    global year
+    c = (open(str(year) + "-" + str(month) + ".csv", "w"))
     c.close()
     default = getDefaultValues()
     writeStartData(default, month)
@@ -294,7 +297,7 @@ def getDefaultValues():
     return default
 
 def writeStartData(default, month):
-    file = open("2016-" + str(month) + ".csv", "a")
+    file = open(str(year) + "-" + str(month) + ".csv", "a")
     monthLength = getMonthLength(month)
     for dateNum in range(0, monthLength):
         weekday = getWeekday(dateNum, month)
@@ -333,10 +336,11 @@ def checkIfDayIsValid(month, day, monthLength):
         return day
         
 def getWeekday(dateNum, month):
+    global year
     weekDaysList = [ "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
     dateNum = dateNum + 1
     dateInput = [year, month, dateNum] 
-    dayOfTheWeek = date(2016, month, dateNum).weekday()
+    dayOfTheWeek = date(int(year), month, dateNum).weekday()
     return weekDaysList[dayOfTheWeek]
 
 def getSettings():

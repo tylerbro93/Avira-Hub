@@ -258,7 +258,7 @@ def setWeatherConditions(w):
 def setTemp(w):
     global tempField
     temp = w.get_temperature('fahrenheit')
-    tempField.config(text = str(temp['temp']))
+    tempField.config(text = (" " + str(temp['temp'])))
     return temp
 
 def setSunriseAndSunsetTimes(w):
@@ -343,11 +343,14 @@ def readAssignmentData():
     
 def averaSpeach(text):
     os.system("espeak -v female3 '" + text + "' -s 140")
+
+def averaSpeachNoWait(text):
+    os.system("espeak -v female3 '" + text + "' -s 140 &")
     
 def welcomeMessage():
     global setup
     text = "Hello, I am AVIRA. It is my job to oversee the Brown Family"
-    averaSpeach(text)
+    averaSpeachNoWait(text)
     #averaSpeach("It is always good to see you, Tyler. I will do my best to serve you, always.")
     setup["morning"] = "off"
     setup["afternoon"] = "off"
