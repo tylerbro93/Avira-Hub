@@ -34,9 +34,13 @@ def settime():
     setup["S"] = datetime.datetime.now().second
     setup["h"] = H
     minute = str(setup["M"])
+    second = str(setup["S"])
     if(len(minute) != 2):
         minute = "0" + minute
         setup["M"] = minute
+    if(len(second) != 2):
+       second = "0" + second
+       setup["S"] = second
     if(H >12):
         H = H - 12
         setup["H"] = H
