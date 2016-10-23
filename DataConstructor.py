@@ -48,9 +48,30 @@ def runActionsFromChoice(choice):
         writeAssignmentInformation(assignmentData)
     elif(choice == 6):
         runCompletionMarker()
+    elif(choice == 7):
+        runChangeDefaults()
+    elif(choice == 8):
+        changeSettings()
+
+def changeSettings():
+    global year
+    print("What would you like to change: \n1. Change Year")
+    choice = input("I would like to: ")
+    if(choice == 1):
+        year = raw_input("What is the year you would like to cange to?\n Enter in the year: ")
+        choice = input("Do you want to make this permenant\n1. NO\t RECCOMENDED\n2. Yes\t[would be best to use if it is a new year]\n\nI would like to: ")
+        if(choice == 2):
+            infile = open("settings.txt", "w")
+            infile.write("year=" + year +"\n")
+            infile.close()
+    choice = actionPrompt()
+    runActionsFromChoice(choice)
 
 def runCompletionMarker():
     import completed
+
+def runChangeDefaults():
+    import changeDefaults
     
 def readInAssignment():
     assignmentData = []
@@ -241,7 +262,7 @@ def editTimes(i):
 
 def actionPrompt():
     print("WELCOME TYLER!\n1. alarms\n2. notification")
-    print("3. Report Times\n4. Set test info\n5. set assignment info\n6. Set task as completed\n7. Set Defualt times\n7. settings")
+    print("3. Report Times\n4. Set test info\n5. set assignment info\n6. Set task as completed\n7. Set Defualt times\n8. settings")
     choice = input("What would like to do: ")
     print(50 * "\n")
     return choice
