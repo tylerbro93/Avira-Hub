@@ -8,6 +8,7 @@ from pyowm import OWM
 
 #sudo apt-get install espeak
 #sudo pip install pyowm
+#sudo apt-get install python-pygame
 
 
 root = Tk()
@@ -65,6 +66,7 @@ def checkTransitionTimes():
         tempField.config(bg=backgroundColor, fg=foregroundColor)
         root.config(background = backgroundColor)
         callAveraButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
+        MusicPlayerButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
     if( int(setup["h"]) >= 9 ):
         backgroundColor = "lawngreen"
         foregroundColor = "green"
@@ -73,6 +75,7 @@ def checkTransitionTimes():
         tempField.config(bg=backgroundColor, fg=foregroundColor)
         root.config(background = backgroundColor)
         callAveraButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
+        MusicPlayerButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
     if((int(setup["h"]) >= int(setup["sunset"])) and (setup["afternoon"] == "off")):
         backgroundColor = "dodgerblue2"
         foregroundColor = "blue2"
@@ -81,6 +84,7 @@ def checkTransitionTimes():
         tempField.config(bg=backgroundColor, fg=foregroundColor)
         root.config(background = backgroundColor)
         callAveraButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
+        MusicPlayerButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
     if((int(setup["h"]) >= int(setup["bedTimeHour"])) and (setup["sleep"] == "off")):
         backgroundColor = "black"
         foregroundColor = "red2"
@@ -89,6 +93,7 @@ def checkTransitionTimes():
         tempField.config(bg=backgroundColor, fg=foregroundColor)
         root.config(background = backgroundColor)
         callAveraButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
+        MusicPlayerButton.config(bg=backgroundColor, fg=foregroundColor, activeforeground=foregroundColor,activebackground=backgroundColor)
         
 def assignTimeValues():
     global setup
@@ -139,6 +144,11 @@ def call():
     readNotificaions()
      
 callAveraButton = Button(root,activebackground=backgroundColor, activeforeground=foregroundColor, font=("times",25,"bold"),highlightthickness=0,bd = 0,text = "CALL",bg=backgroundColor, fg=foregroundColor, command=call)
+
+def runMusicPlayer():
+    os.system("python MusicPlayer.py")
+
+MusicPlayerButton = Button(root,activebackground=backgroundColor, activeforeground=foregroundColor, font=("times",25,"bold"),highlightthickness=0,bd = 0,text = "Music",bg=backgroundColor, fg=foregroundColor, command=runMusicPlayer)
 
 def alertOfTests():
     global tests
@@ -388,6 +398,7 @@ def main():
     weatherField.grid(row=2,column=1)
     tempField.grid(row=2,column=2)
     callAveraButton.grid(row=0, column=0)
+    MusicPlayerButton.grid(row=0, column =2)
     readCSVDataFromFile()
     readTestData()
     setBedTimeHour()
