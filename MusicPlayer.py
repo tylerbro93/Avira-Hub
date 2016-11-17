@@ -33,9 +33,9 @@ musicTextField = Label(musicFieldsFrame,font=("times",10,"bold"),width = "500", 
 visualEffectField = Label(musicFieldsFrame,relief = "solid", height = 10, highlightthickness = 2, highlightbackground="gray17",font=("times", 6),width = "500", text = "ENJOY>>>\n\n\n\n\n", bg="gray11", fg="cyan")
 musicStateFrame = Frame(topFrame, bg = "gray8")
 
-def playRadioStream(radioStationAddress):
+def playRadioStream(radioStationNumber):
     global pauseState
-    subprocess.Popen("ffplay -nodisp "+ radioStationAddress +" &", shell=True)
+    subprocess.Popen("mpc play "+ str(radioStationNumber) +" &", shell=True)
     pauseState = 3
 
 def loadFrom():
@@ -47,7 +47,7 @@ def loadFrom():
         accessMusicFrom = "remote"
         PlayFromButton.config(text = "Playlists")
     else:
-        subprocess.Popen("pkill ffplay", shell=True)
+        subprocess.Popen("mpc stop", shell=True)
         readInPlaylists()
         accessMusicFrom = "local"
         PlayFromButton.config(text = "Internet Radio")
@@ -58,12 +58,13 @@ def readInRadioStations():
     global playlists
     station_Addresses[:] = []
     station_Names[:] = []
-    infile = open("/home/tyler/Radio Stations/Stations.DataBank")
+    infile = open("Radio Stations/Stations.DataBank")
     line = infile.readline().strip()
     while(len(line)>0):
         name, address = line.split("[\]")
         station_Names.append(name)
         station_Addresses.append(address)
+        subprocess.Popen("mpc add " + address, shell=True)
         availablePlaylistsField.insert(END, name)
         line = infile.readline().strip()
         print station_Names
@@ -72,7 +73,7 @@ def readInRadioStations():
 def readInPlaylists():
     global playlists
     playlists[:] = []
-    infile = open("/home/tyler/Music Playlist/playlists.DataBank")
+    infile = open("Music Playlist/playlists.DataBank")
     line = infile.readline().strip()
     while(len(line)>0):
         playlists.append(line)
@@ -92,7 +93,7 @@ def playlistHasBeenSelected():
             loadPlaylistFromFile()
             randomSong()
         else:
-            playRadioStream(station_Addresses[item])
+            playRadioStream(item)
             musicTextField.config(text = station_Names[item])
             root.update()
     except:
@@ -101,7 +102,7 @@ def playlistHasBeenSelected():
 def loadPlaylistFromFile():
     global musicPlayList
     global playlistName
-    infile = open("/home/tyler/Music Playlist/"+ playlistName + ".txt")
+    infile = open("Music Playlist/"+ playlistName + ".txt")
     line = infile.readline().strip()
     while(len(line)>0):
         musicPlayList.append(line)
@@ -131,7 +132,7 @@ def playNextSong():
     global randomSongs
     global pauseState
     musicFileName = randomSongs[songPosition]
-    pygame.mixer.music.load("/home/tyler/Music/" + musicFileName)
+    pygame.mixer.music.load("Music/" + musicFileName)
     pygame.mixer.music.play(0)
     musicName, fileType = musicFileName.split(".")
     musicTextField.config(text = musicName)
@@ -149,7 +150,7 @@ def pauseOrPlaySong():
         pygame.mixer.music.pause()
         pauseButton.config(text = "Play")
     elif(pauseState == 3):
-        subprocess.Popen("pkill ffplay", shell=True)
+        subprocess.Popen("mpc pause", shell=True)
         pauseState = 0
 
 pauseButton = Button(musicStateFrame, width = "5", bg = "black", fg = "cyan2",text = "Pause", font = ("times", 10),highlightbackground="gray17", command = pauseOrPlaySong)
